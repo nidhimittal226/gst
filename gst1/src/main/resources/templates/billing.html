@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Product Manager</title>
+
+    <script>
+        function myFunction() {
+            // Declare variables
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0];
+                td1 = tr[i].getElementsByTagName("td")[1];
+
+                if ((td || td1)) {
+                    txtValue = td.textContent || td.innerText;
+                    txtValue1 = td1.textContent || td1.innerText;
+                    if ((txtValue.toUpperCase().indexOf(filter) > -1) || (txtValue1.toUpperCase().indexOf(filter) > -
+                            1)) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div align="center">
+        <h1>Billing</h1>
+        <a href="new">Create New Product</a>
+        <br>
+        <h2>Click on the product which is to be added</h2>
+        <form th:object="${product}" method="post">
+            <div>
+                <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search by code/name..">
+            </div>
+        </form>
+
+        <br /><br />
+        <table border="1" cellpadding="10" id="myTable">
+            <thead>
+                <tr>
+                    <th>Product Code</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>GST %</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="product : ${listProducts}">
+                    <td th:text="${product.product_code}">Product Code</td>
+                    <td th:text="${product.product_name}">Name</td>
+                    <td th:text="${product.product_price}">Price</td>
+                    <td th:text="${product.product_gst}">GST %</td>
+                </tr>
+            </tbody>
+        </table>
+        <br><br>
+        <table border="1" cellpadding="10" id="myTable2">
+            <thead>
+                <tr>
+                    <th>Product Code</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>GST %</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                    <th>Gross Total</th>
+                </tr>
+            </thead>
+            <tbody id="myNewTableBody">
+            </tbody>
+        </table>
+
+
+        <script>
+            var table1 = document.getElementsByTagName("table")[0];
+            var tbody1 = table1.getElementsByTagName("tbody")[0];
+            var dispAmt = 0
+
+            tbody1.onclick = function (e) {
+                e = e || window.event;
+                var data = [];
+                var target = e.srcElement || e.target;
+                while (target && target.nodeName !== "TR") {
+                    target = target.parentNode;
+                }
+                if (target) {
+                    var cells = target.getElementsByTagName("td");
+                    for (var i = 0; i < cells.length; i++) {
+                        data.push(cells[i].innerHTML);
+                    }
+                }
+                var trnode = document.createElement("tr");
+                var Amount = 0
+                for (var i = 0; i < data.length + 3; i++) {
+                    var tdnode = document.createElement("td");
+                    var textnode = document.createTextNode(data[i]);
+                    //console.log(textnode.childNodes)
+                    if (i == 2) {
+                        Amount = Number(Amount) + Number(textnode.textContent)
+                    }
+                    if (i == 3) {
+                        Amount = Amount + Number(Amount * (textnode.textContent) / 100)
+                    }
+                    if (i == 4) {
+                        var textnode = document.createElement('p')
+                        textnode.innerHTML = window.prompt("Enter the qty: ")
+                        var FinalAmount = Number(textnode.textContent) * Number(Amount)
+                    }
+                    if (i == 5) {
+                        var textnode = document.createElement('p')
+                        textnode.innerHTML = FinalAmount
+
+                    }
+                    if (i == 6) {
+                        var textnode = document.createElement('p')
+                        dispAmt = dispAmt + FinalAmount
+                        textnode.innerHTML = dispAmt
+
+                    }
+                    tdnode.appendChild(textnode);
+                    trnode.appendChild(tdnode);
+                }
+
+                document.getElementById("myNewTableBody").appendChild(trnode);
+                alert(data);
+            };
+        </script>
+    </div>
+</body>
+
+</html>
